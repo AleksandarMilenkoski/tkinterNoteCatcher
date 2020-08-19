@@ -1,0 +1,2 @@
+class CommentsException(Exception):
+    pass

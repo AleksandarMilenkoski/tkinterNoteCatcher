@@ -1,0 +1,8 @@
+#untracked folders
+/venv/
+**/__pycache__/*
+/.idea/
+#untracked files
+code*.7z
+*.db
+*.zargo~
