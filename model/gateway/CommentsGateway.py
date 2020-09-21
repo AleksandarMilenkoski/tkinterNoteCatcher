@@ -5,8 +5,8 @@ from model.domain.Comment import Comment
 
 class CommentsGateway:
     '''Comment Objects gateway'''
-    def __init__(self, resource):
-        self.resource = resource
+    def __init__(self):
+        self.resource = CommentsTable()
 
     def getCommentById(self, id):
         data = self.resource.selectCommentById(id)
@@ -17,11 +17,13 @@ class CommentsGateway:
         return self._dataListToObjectList(data)
 
     def getCommentsByLimit(self, limit):
+        # print(limit)
         data = self.resource.selectCommentsByLimit(limit)
         return self._dataListToObjectList(data)
 
-    def getCommentsByLimitOrderby(self, limit, order):
-        data = self.resource.selectCommentByLimitOrderBy(limit, order)
+    def getCommentsByLimitOrderby(self, limit, order, current_page):
+        data = self.resource.selectCommentByLimitOrderBy(limit, order, current_page)
+        # print(data)
         return self._dataListToObjectList(data)
 
     def getCommentsByPhrase(self, phrase):
@@ -49,19 +51,22 @@ class CommentsGateway:
 
     def _dataListToObjectList(self, dataList):
         objectsList = []
-        for id, comment in dataList:
-            objectsList.append(Comment(id, comment))
+        for id, comment, date_created, date_modified in dataList:
+            objectsList.append(Comment(id, comment, date_created, date_modified))
 
         return objectsList
 
-# newCommentsGateway = CommentsGateway(CommentsTable())
-# newCommentsGateway.getCommentsByLimit(5)
-# print(newCommentsGateway.getCommentsByLimitOrderby(5, [('id', 'DESC')])[0].getId())
-# newCommentsGateway.getCommentById(7)
-# newCommentsGateway.getAllCommets()
-# newCommentsGateway.getCommentsByPhrase('war')
-# newCommentsGateway.getCommentByPhraseLimit('war', 5)
-# newCommentsGateway.getCommentByPhraseLimitOrder('war', 5, [('id', 'DESC')])
-# newCommentsGateway.addComment(Comment(None, 'nestoNovo'))
-# newCommentsGateway.editComment(Comment(335, 'nestoNovoEdit'))
-# newCommentsGateway.deleteComment(Comment(335, 'nestoNovoEdit'))
+
+if __name__ == '__main__':
+
+    newCommentsGateway = CommentsGateway()
+    # newCommentsGateway.getCommentsByLimit(5)
+    print(newCommentsGateway.getCommentsByLimitOrderby(5, [('id', 'DESC')], 1)[0].get_id())
+    # newCommentsGateway.getCommentById(7)
+    # newCommentsGateway.getAllCommets()
+    # newCommentsGateway.getCommentsByPhrase('war')
+    # newCommentsGateway.getCommentByPhraseLimit('war', 5)selectCommentByLimitOrderBy
+    # newCommentsGateway.getCommentByPhraseLimitOrder('war', 5, [('id', 'DESC')])
+    # newCommentsGateway.addComment(Comment(None, 'nestoNovo'))
+    # newCommentsGateway.editComment(Comment(335, 'nestoNovoEdit'))
+    # newCommentsGateway.deleteComment(Comment(335, 'nestoNovoEdit'))

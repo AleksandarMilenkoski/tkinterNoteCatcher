@@ -1,6 +1,6 @@
-from tkinter import IntVar, Frame
+from tkinter import IntVar, Frame, DISABLED, NORMAL
 from tkinter.ttk import Combobox, Style
-from Paginator import Paginator
+from view.helpers.paginator.Paginator import Paginator
 
 
 class PaginatorWithCombobox(Paginator):
@@ -32,9 +32,16 @@ class PaginatorWithCombobox(Paginator):
         super()._update_labels()
         self._update_combobox()
 
-    def update(self, total_pages, current_page, start_page=1):
-        self._combobox.config(values=[page for page in range(1, total_pages + 1)])
-        return super().update(total_pages, current_page, start_page)
+    def update(self, total_pages, current_page):
+        self._combobox.config(values=[page for page in range(1, total_pages + 1)],
+                              width=self._count_number_positions(self._total_pages))
+
+        self._total_pages = total_pages
+        self._current_page = current_page
+
+        self._update_first_last_page()
+
+        self._update_labels()
 
 
     def _render_combobox(self):
@@ -43,7 +50,7 @@ class PaginatorWithCombobox(Paginator):
         combobox.pack(padx=(self._label_spacing + 4, 0))
         # print(self._label_spacing)
         combobox.config(values=[page for page in range(1, self.total_pages+1)], textvariable=combobox_value,
-                        **self._combobox_style['config'], width=self._count_number_positions(self.total_pages))
+                        **self._combobox_style['config'], width=self._count_number_positions(self._total_pages))
         combobox.config(style='Pagination.TCombobox')
         style = Style()
         style.configure('Pagination.TCombobox', **self._combobox_style['style'])
@@ -116,6 +123,14 @@ class PaginatorWithCombobox(Paginator):
             number //= 10
 
         return positions
+
+    def disable(self):
+        super().disable()
+        self._combobox.config(state=DISABLED)
+
+    def enable(self):
+        super().enable()
+        self._combobox.config(state=NORMAL)
 
 
 pagination_style = {

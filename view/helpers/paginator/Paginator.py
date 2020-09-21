@@ -36,6 +36,8 @@ class Page_Label(tk.Label):
     def __init__(self, master, page_number, style, on_click, is_selected, is_active, is_displayed=True):
         tk.Label.__init__(self, master, width=0, text=page_number)
 
+        self._on_click_call_back_func = on_click
+
         if is_selected:
             current_style = style[SELECTED, NORMAL_STATE]
         else:
@@ -83,11 +85,23 @@ class Page_Label(tk.Label):
 
         config_style(self, self._style, is_selected, is_active)
 
+    def disable(self):
+        self.config(state='disabled')
+        self.unbind("<1>")
+
+    def enable(self):
+        self.config(state='normal')
+        self.bind("<1>", lambda event: self._on_click_call_back_func(self))
 
 class Page_Control(tk.Frame):
 
+    def __init__(self, master=None, cnf={}, **kw):
+        super().__init__(master, cnf, **kw)
+        self._paginator = master
+
     def _navigation_control(self, pagination, style, control_name, text):
         onclick_control = getattr(pagination, "%s_page" % control_name)
+        # print("%s_page" % control_name)
 
         # print("Contorl_name "+control_name)
 
@@ -119,6 +133,18 @@ class Left_Control(Page_Control):
                 self._previous_label = self._navigation_control(pagination, style, "prev", prev_button)
                 self._previous_label.pack(side=LEFT, padx=(spacing, 0))
 
+    def disable(self):
+        self._previous_label.unbind('<1>')
+        self._previous_label.config(state='disabled')
+        self._first_label.unbind('<1>')
+        self._first_label.config(state='disabled')
+
+    def enable(self):
+        self._previous_label.bind('<1>', lambda event: getattr(self._paginator, "prev_page")())
+        self._previous_label.config(state='normal')
+        self._first_label.bind('<1>', lambda event: getattr(self._paginator, "first_page")())
+        self._first_label.config(state='normal')
+
 
 class Right_Control(Page_Control):
     def __init__(self, pagination, style, last_button, next_button, spacing):
@@ -134,6 +160,18 @@ class Right_Control(Page_Control):
             if next_button is not None:
                 self._next_label = self._navigation_control(pagination, style, "next", next_button)
                 self._next_label.pack(side=RIGHT, padx=(0, spacing))
+
+    def disable(self):
+        self._next_label.unbind('<1>')
+        self._next_label.config(state='disabled')
+        self._last_label.unbind('<1>')
+        self._last_label.config(state='disabled')
+
+    def enable(self):
+        self._next_label.bind('<1>', lambda event: getattr(self._paginator, "next_page")())
+        self._next_label.config(state='normal')
+        self._last_label.bind('<1>', lambda event: getattr(self._paginator, "last_page")())
+        self._last_label.config(state='normal')
 
 
 class Paginator(tk.Frame):
@@ -280,6 +318,8 @@ class Paginator(tk.Frame):
             if page_label.is_displayed:
                 page_label.pack_forget()
                 page_label.is_displayed = False
+
+        # self.disable()
 
     def _create_configuration_of_state(self, pagination_style, selected_state, active_state):
         config = {}
@@ -462,6 +502,7 @@ class Paginator(tk.Frame):
                 page_label.is_displayed = False
 
     def _on_click_page(self, new_page):
+        # print(new_page.page_number)
         if new_page.page_number == self._current_page:
             return
 
@@ -475,6 +516,7 @@ class Paginator(tk.Frame):
         if self._command is not None:
             self._command(self._current_page)
 
+
     def update(self, total_pages, current_page, start_page=1):
         end_page = min(total_pages, start_page + self._displayed_pages - 1)
 
@@ -487,7 +529,31 @@ class Paginator(tk.Frame):
         self._total_pages = total_pages
         self._current_page = current_page
 
+        # self._update_first_last_page()
+
         self._update_labels()
+
+    def disable(self):
+
+        for label in self._list_of_page_labels:
+            label.disable()
+
+        if self._right_controls != None:
+            self._right_controls.disable()
+
+        if self._left_controls != None:
+            self._left_controls.disable()
+
+    def enable(self):
+
+        for label in self._list_of_page_labels:
+            label.enable()
+
+        if self._right_controls != None:
+            self._right_controls.enable()
+
+        if self._left_controls != None:
+            self._left_controls.enable()
 
 
 pagination_style1 = {
