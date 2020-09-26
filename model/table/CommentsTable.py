@@ -15,33 +15,33 @@ class CommentsTable(TableAbstract):
 
 
 
-    def selectAllComments(self):
-        self.cursor.execute('''
-			SELECT *
-  			FROM comments;
-			''')
-        data = self.cursor.fetchall()
+    # def selectAllComments(self):
+    #     self.cursor.execute('''
+	# 		SELECT *
+  	# 		FROM comments;
+	# 		''')
+    #     data = self.cursor.fetchall()
+    #
+    #     return data
 
-        return data
+    # def selectCommentsByLimit(self, limit):
+    #     self.cursor.execute('''
+	# 		SELECT *
+  	# 		FROM comments
+  	# 		LIMIT ?;
+	# 		''', (limit,))
+    #     data = self.cursor.fetchall()
+    #
+    #     return data
 
-    def selectCommentsByLimit(self, limit):
-        self.cursor.execute('''
-			SELECT *
-  			FROM comments
-  			LIMIT ?;
-			''', (limit,))
-        data = self.cursor.fetchall()
-
-        return data
-
-    def selectCommentById(self, id):
-        self.cursor.execute('''
-			SELECT *
-  			FROM comment
-  			WHERE id=?;
-			''', (id,))
-        data = self.cursor.fetchone()
-        return data
+    # def selectCommentById(self, id):
+    #     self.cursor.execute('''
+	# 		SELECT *
+  	# 		FROM comment
+  	# 		WHERE id=?;
+	# 		''', (id,))
+    #     data = self.cursor.fetchone()
+    #     return data
 
     def selectCommentByLimitOrderBy(self, limit, order, current_page):
         offset = (current_page - 1) * limit
@@ -81,38 +81,39 @@ class CommentsTable(TableAbstract):
 
         return data
 
-    def selectCommentByPhrase(self, phrase):
-        self.cursor.execute('''
-			SELECT *
-              FROM comments
-             WHERE lower(comments.comment) LIKE ?
-			''', ('%' + phrase.lower() + '%',))
-        data = self.cursor.fetchall()
+    # def selectCommentByPhrase(self, phrase):
+    #     self.cursor.execute('''
+	# 		SELECT *
+    #           FROM comments
+    #          WHERE lower(comments.comment) LIKE ?
+	# 		''', ('%' + phrase.lower() + '%',))
+    #     data = self.cursor.fetchall()
+    #
+    #     return data
 
-        return data
+    # def selectCommentByPhraseLimit(self, phrase, limit):
+    #     self.cursor.execute('''
+	# 		SELECT *
+    #           FROM comment
+    #          WHERE lower(comment.comment) LIKE ?
+    #          LIMIT ?
+	# 		''', ('%' + phrase.lower() + '%', limit, ))
+    #     data = self.cursor.fetchall()
+    #
+    #     return data
 
-    def selectCommentByPhraseLimit(self, phrase, limit):
-        self.cursor.execute('''
-			SELECT *
-              FROM comment
-             WHERE lower(comment.comment) LIKE ?
-             LIMIT ?
-			''', ('%' + phrase.lower() + '%', limit, ))
-        data = self.cursor.fetchall()
-
-        return data
-
-    def selectCommentByPhraseLimitOrder(self, phrase, limit, order):
+    def selectCommentByPhraseLimitOrder(self, phrase, limit, order, current_page):
+        offset = (current_page - 1) * limit
         sql = '''
         			SELECT *
-                      FROM comment
-                     WHERE lower(comment.comment) LIKE {0}
+                      FROM comments
+                     WHERE lower(comments.comment) LIKE {0}
                      ORDER BY {1}
-                     LIMIT {2};
-        			 '''
+                     LIMIT {2} OFFSET {3};
+              '''
         orderStr = self._generateOrderClause(order)
 
-        sql = sql.format(('"%' + phrase.lower() + '%"'), orderStr, str(limit))
+        sql = sql.format(('"%' + phrase.lower() + '%"'), orderStr, str(limit), offset)
 
         # print(sql)
 
@@ -120,21 +121,54 @@ class CommentsTable(TableAbstract):
 
         data = self.cursor.fetchall()
 
+        # print(data)
+
         return data
 
     def selectAllCommentsCount(self):
-        self.cursor.execute('''
+        sql = '''
             SELECT count( * ) 
-              FROM comments;
-        ''')
+              FROM comments;        
+        '''
+
+        self.cursor.execute(sql)
 
         data = self.cursor.fetchone()[0]
 
         return data
 
-    def insertComment(self, comment):
+    def selectCommentsByPhraseCount(self, phrase):
+        sql = '''
+            SELECT count( * ) 
+              FROM comments
+             WHERE lower(comments.comment) LIKE {0}
+        '''
+
+        sql = sql.format(('"%' + phrase.lower() + '%"'))
+
+        self.cursor.execute(sql)
+
+        data = self.cursor.fetchone()[0]
+
+        return data
+
+    def InsertComment(self, text):
         self.cursor.execute('''
-			INSERT INTO comment (
+        			INSERT INTO comments (
+                                comment,
+                                date_created,
+                                date_modified
+                            )
+                            VALUES (
+                                ?, datetime(), datetime()
+                            );
+        			''', (text,))
+
+        self.connection.commit()
+
+    def insertCommentOld(self, comment):
+        self.cursor.execute('''
+			INSERT INTO comments (
                         comment
                     )
                     VALUES (
@@ -162,9 +196,10 @@ class CommentsTable(TableAbstract):
 
     def updateComment(self, id, comment):
         self.cursor.execute('''
-			UPDATE comment
-			   SET comment = :comment
-			 WHERE comment.id = :id;
+			UPDATE comments
+			   SET comment = :comment,
+			       date_modified = datetime()
+			 WHERE comments.id = :id;
 			''', {
             'id': id,
             'comment': comment
@@ -182,7 +217,7 @@ class CommentsTable(TableAbstract):
 
     def deleteComment(self, id):
         self.cursor.execute('''
-			DELETE FROM comment
+			DELETE FROM comments
       		WHERE id = ?;
 			''', (id,)
                             )

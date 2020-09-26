@@ -109,6 +109,9 @@ class PaginatorWithCombobox(Paginator):
             tmp_end_page = self._total_pages
             tmp_start_page = tmp_end_page - self._displayed_pages + 1
 
+        if tmp_start_page < 1:
+            tmp_start_page = 1
+
         # print(tmp_start_page)
         # print(tmp_end_page)
 

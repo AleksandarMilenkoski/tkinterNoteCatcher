@@ -34,8 +34,8 @@ class CommentsGateway:
         data = self.resource.selectCommentByPhraseLimit(phrase, limit)
         return self._dataListToObjectList(data)
 
-    def getCommentByPhraseLimitOrder(self, phrase, limit, order):
-        data = self.resource.selectCommentByPhraseLimitOrder(phrase, limit, order)
+    def getCommentByPhraseLimitOrder(self, phrase, limit, order, current_page):
+        data = self.resource.selectCommentByPhraseLimitOrder(phrase, limit, order, current_page)
         return self._dataListToObjectList(data)
 
     def addComment(self, obj):
@@ -44,10 +44,11 @@ class CommentsGateway:
         # print(obj.getId())
 
     def editComment(self, obj):
-        self.resource.updateComment(obj.getId(), obj.getComment())
+        self.resource.updateComment(obj.get_id(), obj.get_comment())
 
     def deleteComment(self, obj):
-        self.resource.deleteComment(obj.getId())
+        # print(obj)
+        self.resource.deleteComment(obj.get_id())
 
     def _dataListToObjectList(self, dataList):
         objectsList = []

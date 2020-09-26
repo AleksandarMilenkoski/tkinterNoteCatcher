@@ -1,6 +1,11 @@
 WINDOW_TITLE = 'Comments App'
 ICON_FILE = 'comment.png'
 SEARCH_LABEL_TEXT = 'Search Pharse:'
-COMMENTS_PER_PAGE = 5
+COMMENTS_PER_PAGE = 2
 DB_PATH = 'db.db'
 ORDER_BY = [('id', 'DESC')]
+ADD_WINDOW_TITLE = "Add Comment"
+TEXT_START_INDEX = '1.0'
+TEXT_END_INDEX = 'end - 1 char'
+WINDOW_WIDTH = 840
+WINDOW_HEIGHT = 465

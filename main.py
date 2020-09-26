@@ -1,4 +1,6 @@
 import controller.CommentsController
 
 if __name__ == '__main__':
-    controller.CommentsController.CommentsController().get_view().main_loop()
+    root = controller.CommentsController.CommentsController().get_view()
+    # root.update_main_window_layout_min_size()
+    root.main_loop()

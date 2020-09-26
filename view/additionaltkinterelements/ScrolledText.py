@@ -44,6 +44,15 @@ class ScrolledText(Text):
         # self.grid_configure(padx=(0, self._vertical_scroll_bar.winfo_width()))
         # print(self._vertical_scroll_bar.winfo_width())
         self.config(wrap=WORD)
+        # self.unbind('<Button-4>')
+        # self.unbind('<Button-5>')
+        # self.unbind('<MouseWheel>')
+        # print(self.bind_all())
+        # for i in self.bind():
+        #     self.unbind(i)
+        # for event in self.bind_all():
+        #     self.unbind_all(event)
+        # print(self.bind_all())
 
     def _on_vertical_scroll_bar_show(self, *args):
         flag = self._vertical_scroll_bar.set(args[0], args[1])
