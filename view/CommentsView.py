@@ -116,16 +116,18 @@ class CommentsView:
         def _on_search_button_click():
             search_phrase = _check_if_empty_search_phrase()
             if search_phrase == '':
-                return
+                return 'break'
             self.serarch_phrase = search_phrase
             self.current_page = 1
             # print(search_phrase)
             self._controller.get_comments()
 
+            return 'break'
+
         def _on_clear_button_click():
             search_phrase = _check_if_empty_search_phrase()
-            if search_phrase == '':
-                return
+            if self.serarch_phrase == '':
+                return 'break'
 
             serach_value.set('')
             self.serarch_phrase = ''
@@ -133,12 +135,17 @@ class CommentsView:
             # print(search_phrase)
             self._controller.get_comments()
 
+            return 'break'
+
         search_container = Frame(self._search_frame)
         search_container.pack(side=TOP, anchor=N, padx=10, pady=(20,10))
 
         Label(search_container, text=config.SEARCH_LABEL_TEXT).pack(side=LEFT)
 
-        Entry(search_container, textvariable=serach_value, width=30).pack(side=LEFT, padx=(5, 10))
+        search_entry = Entry(search_container, textvariable=serach_value, width=30)
+        search_entry.pack(side=LEFT, padx=(5, 10))
+        search_entry.bind('<Return>', lambda event: _on_search_button_click())
+        search_entry.bind('<Escape>', lambda event: _on_clear_button_click())
 
         Button(search_container, text='Search', command=_on_search_button_click).pack(side=LEFT)
 

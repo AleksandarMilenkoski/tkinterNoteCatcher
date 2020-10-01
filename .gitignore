@@ -2,6 +2,7 @@
 /venv/
 **/__pycache__/*
 /.idea/
+/.spyproject/
 #untracked files
 code*.7z
 *.db
