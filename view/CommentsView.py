@@ -1,15 +1,12 @@
 import config
 from tkinter import Tk, PhotoImage, Frame, BOTH, GROOVE, TRUE, X, Y, Menu, LEFT, StringVar, N, W, NW, TOP, RIGHT, \
     NE, FLAT, DISABLED, NORMAL, Toplevel, END
-from tkinter.ttk import Label, Entry, Button
+from tkinter.ttk import Label, Entry, Button, Style
 from view.additionaltkinterelements.ScrolledFrame import ScrolledFrame, ALIGN_CENTER, ALIGN_RIGHT
 from view.additionaltkinterelements.TkComment import TkComment
 from view.helpers.paginator.PaginatorWithCombobox import PaginatorWithCombobox, pagination_style
 from math import ceil
 from view.additionaltkinterelements.ScrolledText import ScrolledText
-
-# WINDOW_WIDTH = 840
-# WINDOW_HEIGHT = 465
 
 
 class CommentsView:
@@ -41,6 +38,7 @@ class CommentsView:
         # self._render_comments()
         # self._update_comments()
         self._render_pagination_bar()
+        self._render_pages_label()
 
         # self._set_main_window_layout_min_size()
 
@@ -102,6 +100,9 @@ class CommentsView:
         self._pagination_frame = pagination_frame = Frame(main_frame)
         # pagination_frame.pack(side=TOP, anchor=N, ipadx=10, ipady=10, padx=10, pady=10)
         pagination_frame.pack()
+        
+        self._page_label_frame = page_label_frame = Frame(pagination_frame)
+        page_label_frame.pack(side=RIGHT)
 
     def _render_search_bar(self):
         serach_value = StringVar()
@@ -161,6 +162,7 @@ class CommentsView:
         self._clearElementChilderns(self._comments_inner_frame)
         self._render_comments(domain_commets_objects)
         self._paginator.update(ceil(self.comments_count/config.COMMENTS_PER_PAGE), self.current_page)
+        self._update_pages_label()
         self._show_hide_paginator()
 
     def disable_gui(self):
@@ -221,7 +223,7 @@ class CommentsView:
 
     def _show_paginator(self):
         if not self._pagination_frame.winfo_ismapped():
-            print("vnatre")
+            # print("vnatre")
             self._pagination_frame.pack()
 
     def _show_hide_paginator(self):
@@ -277,5 +279,20 @@ class CommentsView:
         # print(self._root.winfo_width())
         # print(self._root.winfo_height())
         # pass
+    
+    def _render_pages_label(self):
+        self._text_label_var = text_label_var = StringVar()
+        page_label = Label(self._page_label_frame)
+        page_label.config(textvariable=text_label_var, font='Verdana 10', style='PagesLabel.TLabel')
+        page_label.pack()
+        Style().configure('PagesLabel.TLabel', foreground=config.PAGES_LABEL_COLOR)
+        
+    def _update_pages_label(self):
+        text_label_var = self._text_label_var
+        label_text_content = '/ {}'.format(ceil(self.comments_count/config.COMMENTS_PER_PAGE))
+        text_label_var.set(label_text_content)
+
+    
+    
 
 

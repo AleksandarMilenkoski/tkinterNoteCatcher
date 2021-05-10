@@ -160,7 +160,7 @@ class CommentsTable(TableAbstract):
                                 date_modified
                             )
                             VALUES (
-                                ?, datetime(), datetime()
+                                ?, datetime("now", "localtime"), datetime("now", "localtime")
                             );
         			''', (text,))
 
@@ -198,7 +198,7 @@ class CommentsTable(TableAbstract):
         self.cursor.execute('''
 			UPDATE comments
 			   SET comment = :comment,
-			       date_modified = datetime()
+			       date_modified = datetime("now", "localtime")
 			 WHERE comments.id = :id;
 			''', {
             'id': id,

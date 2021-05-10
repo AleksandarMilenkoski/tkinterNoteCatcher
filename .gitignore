@@ -5,5 +5,6 @@
 /.spyproject/
 #untracked files
 code*.7z
-*.db
+#*.db
+*.pyc
 *.zargo~

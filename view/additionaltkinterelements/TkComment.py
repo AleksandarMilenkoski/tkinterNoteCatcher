@@ -1,4 +1,4 @@
-from tkinter import LEFT, RIGHT, NE, Frame, W, X, END, DISABLED, NORMAL
+from tkinter import LEFT, RIGHT, NE, Frame, W, X, END, DISABLED, NORMAL, Label, StringVar, NW, E
 from tkinter.ttk import Button, Style
 from view.additionaltkinterelements.ScrolledText import ScrolledText
 from tkinter.messagebox import askokcancel
@@ -6,10 +6,12 @@ from stylenameElementOptions import stylename_element_options
 import pyperclip
 import html
 import config
+import datetime
 
 
 class TkComment(Frame):
     def __init__(self, master, domain_obj=None, controller=None, master_gui=None, **kw):
+
         super().__init__(master, **kw)
 
         self._master_gui = master_gui
@@ -21,6 +23,8 @@ class TkComment(Frame):
         self._setup_layout()
         self._render_text()
         self._render_buttons()
+        self._render_date_created()
+        self._render_date_modified()
         self._hide_edit_buttons()
         self._setup_style()
         # self.disable_standard_buttons()
@@ -36,8 +40,14 @@ class TkComment(Frame):
         self._text_container = text_container = Frame(self)
         text_container.pack()
 
-        self._buttons_container = buttons_container = Frame(self)
-        buttons_container.pack()
+        self._buttons_datetime_container = buttons_datetime_container = Frame(self)
+        buttons_datetime_container.pack()
+
+        self._buttons_container = buttons_container = Frame(buttons_datetime_container)
+        buttons_container.grid(row=0, column=0)
+
+        self._datetime_container = datetime_container = Frame(buttons_datetime_container)
+        datetime_container.grid(row=1, column=0)
 
     def _render_text(self):
         self._text = text = ScrolledText(self._text_container)
@@ -114,6 +124,7 @@ class TkComment(Frame):
             self._domain_obj.set_comment(content_text)
             self._controller.edit_comment(self._domain_obj)
             self._master_gui.enable_gui()
+            # self._update_date_modified()
         else:
             self._on_cancel_button_click()
 
@@ -153,8 +164,55 @@ class TkComment(Frame):
         self.pack_configure(pady=5, anchor=W, fill=X)
         self.config(highlightthickness=1, highlightbackground='#a0a0a0')
 
-        self._text_container.pack_configure(side=LEFT, padx=(15, 35), pady=15)
+        self._text_container.pack_configure(side=LEFT, padx=(15, 25), pady=15)
 
-        self._buttons_container.pack_configure(side=RIGHT, pady=25, padx=15, anchor=NE)
+        self._buttons_datetime_container.pack_configure(side=RIGHT, pady=25, padx=15, anchor=NE)
+
+        self._buttons_container.grid_configure(sticky=E)
+
+        self._datetime_container.grid_configure(pady=20, sticky=E)
 
         self._text.config(width=68, height=12, font='Verdana, 11', spacing1=1, spacing2=2, spacing3=1, wrap='word')
+
+    def _render_date_created(self):
+        datetime_conainer = self._datetime_container
+
+        date_created = self._convert_date_string_to_datetime_obj(self._domain_obj.get_date_created())
+
+        # create grid space
+        # Label(datetime_conainer, text=' ').grid(row=2, column=0, pady=50)
+
+        #create date created
+        Label(datetime_conainer, text=config.DATE_CREATED_LABEL_TEXT).grid(row=0, column=0, sticky=NW)
+        Label(datetime_conainer, text=date_created.strftime(config.DATE_CREATED_DATETIME_FORMAT_STRING)).grid(row=0, column=1)
+
+    def _render_date_modified(self):
+        # self._date_modified_str_var = StringVar()
+        datetime_conainer = self._datetime_container
+
+        date_modified = self._convert_date_string_to_datetime_obj(self._domain_obj.get_date_modified())
+
+        Label(datetime_conainer, text=config.DATE_MODIFIED_LABEL_TEXT).grid(row=1, column=0, sticky=NW)
+        Label(datetime_conainer, text=date_modified.strftime(config.DATE_MODIFIED_DATETIME_FORMAT_STRING)).grid(row=1, column=1)
+
+        # self._date_modified_str_var.set(date_modified.strftime(config.DATE_CREATED_DATETIME_FORMAT_STRING))
+
+        # self._update_date_modified()
+
+    # def _update_date_modified(self):
+    #     date_modified = self._convert_date_string_to_datetime_obj(self._domain_obj.get_date_modified())
+    #     self._date_modified_str_var.set(date_modified.strftime(config.DATE_CREATED_DATETIME_FORMAT_STRING))
+        # print(date_modified.strftime(config.DATE_CREATED_DATETIME_FORMAT_STRING))
+
+    def _convert_date_string_to_datetime_obj(self, date_str):
+        # print(date_str)
+        # print(date_str[0:4])
+        # print(date_str[5:7])
+        # print(date_str[8:10])
+        # print(date_str[11:13])
+        # print(date_str[14:16])
+        # print(date_str[17:19])
+        return datetime.datetime(int(date_str[0:4]), int(date_str[5:7]), int(date_str[8:10]), int(date_str[11:13]),
+                                 int(date_str[14:16]), int(date_str[17:19]))
+
+
